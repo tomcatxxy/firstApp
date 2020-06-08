@@ -1,6 +1,9 @@
 package com.swufe.buffermergetool;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
@@ -62,9 +65,18 @@ public class MainActivity extends AppCompatActivity implements Runnable{
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Thread thread=new Thread(MainActivity.this);
-                thread.start();
-                Toast.makeText(MainActivity.this,"Update data now, please wait a moment!",Toast.LENGTH_SHORT).show();
+                AlertDialog.Builder builder=new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("提示").setMessage("请确认是否立即更新数据？").setPositiveButton("是", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Log.i(TAG,"FloatingActionButton：对话框事件处理");
+                        Thread thread=new Thread(MainActivity.this);
+                        thread.start();
+                        Toast.makeText(MainActivity.this,"Update data now, please wait a moment!",Toast.LENGTH_SHORT).show();
+                    }
+                }).setNegativeButton("否",null);
+                builder.create().show();
+
             }
         });
 
@@ -115,6 +127,26 @@ public class MainActivity extends AppCompatActivity implements Runnable{
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
+    }
+
+    public boolean onOptionsItemSelected(@NonNull MenuItem item){
+        if(item.getItemId()==R.id.action_settings){}
+        else if(item.getItemId()==R.id.action_search){
+            Intent query = new Intent(this, QueryActivity.class);
+            startActivity(query);
+        }
+        else if(item.getItemId()==R.id.action_helper){
+            AlertDialog.Builder builder=new AlertDialog.Builder(MainActivity.this);
+            builder.setTitle("使用帮助").setMessage("这是一款针对西南财经大学经济信息工程学院学生的APP，在这个APP中您能看到下面的信息：\n" +
+                    "1、西南财经大学官网最近的通知公告；\n" +
+                    "2、经济信息工程学院最近的通知公告;\n" +
+                    "3、西南财经大学校园招聘信息；\n" +
+                    "4、最近的学术讲座的举办情况；\n" +
+                    "5、经济信息工程学院官网上发布的科技前沿信息。\n\n" +
+                    "APP每天都会更新一次信息，当然您也可以直接点击APP中的红色按钮来立刻更新信息，感谢您的使用！").setNegativeButton("明白了",null);
+            builder.create().show();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -207,8 +239,8 @@ public class MainActivity extends AppCompatActivity implements Runnable{
             Elements lis=(doc.select("body > div.wrap.mar0 > ul.newListContent")).select("li");
             String title,detail;
             for(int i=0;i<lis.size();i++){
-                title=lis.get(i).select("a").text()+"——"+lis.get(i).select("span").text();
-                detail="#https://jobzpgl.swufe.edu.cn"+(lis.get(i).attr("onclick")).replace("javascript:window.location.href='","");
+                title=lis.get(i).select("a").text()+"——"+lis.get(i).select("span").text()+"#";
+                detail="https://jobzpgl.swufe.edu.cn"+(lis.get(i).attr("onclick")).replace("javascript:window.location.href='","");
                 Log.i(TAG,"getRecruitInfo():"+title+detail);
                 dataList.add(new DataItem(title,detail));
             }
@@ -236,8 +268,8 @@ public class MainActivity extends AppCompatActivity implements Runnable{
             Elements lis=(doc.select("body > div.wrap.mar0 > ul.newListContent")).select("li");
             String title,detail;
             for(int i=0;i<lis.size();i++){
-                title=lis.get(i).select("a").text()+"——"+lis.get(i).select("span").text();
-                detail="#https://jobzpgl.swufe.edu.cn"+(lis.get(i).attr("onclick")).replace("javascript:window.location.href='","");
+                title=lis.get(i).select("a").text()+"——"+lis.get(i).select("span").text()+"#";
+                detail="https://jobzpgl.swufe.edu.cn"+(lis.get(i).attr("onclick")).replace("javascript:window.location.href='","");
                 Log.i(TAG,"getNeedsInfo():"+title+detail);
                 dataList.add(new DataItem(title,detail));
             }
@@ -265,8 +297,8 @@ public class MainActivity extends AppCompatActivity implements Runnable{
             Elements lis=(doc.select("body > div.wrap.mar0 > ul.newListContent")).select("li");
             String title,detail;
             for(int i=0;i<lis.size();i++){
-                title=lis.get(i).select("a").text()+"——"+lis.get(i).select("span").text();
-                detail="#https://jobzpgl.swufe.edu.cn"+(lis.get(i).attr("onclick")).replace("javascript:window.location.href='","");
+                title=lis.get(i).select("a").text()+"——"+lis.get(i).select("span").text()+"#";
+                detail="https://jobzpgl.swufe.edu.cn"+(lis.get(i).attr("onclick")).replace("javascript:window.location.href='","");
                 Log.i(TAG,"getInternshipInfo():"+title+detail);
                 dataList.add(new DataItem(title,detail));
             }
@@ -290,8 +322,8 @@ public class MainActivity extends AppCompatActivity implements Runnable{
             Elements lis=(doc.select("body > div > div.c_main > div > div > div.c_box_left > ul")).select("li");
             String title,detail;
             for(int i=0;i<lis.size();i++){
-                title=lis.get(i).select("a").attr("title")+"——"+lis.get(i).select("span").text();
-                detail="#http://www.swufe.edu.cn"+(lis.get(i).select("a").attr("href")).replace("..","");
+                title=lis.get(i).select("a").attr("title")+"——"+lis.get(i).select("span").text()+"#";
+                detail="http://www.swufe.edu.cn"+(lis.get(i).select("a").attr("href")).replace("..","");
                 Log.i(TAG,"getSwufeNotices():"+title+detail);
                 dataList.add(new DataItem(title,detail));
             }
@@ -315,8 +347,8 @@ public class MainActivity extends AppCompatActivity implements Runnable{
             Elements as=(doc.select("body > div.main > div > div > div.col-xs-12.col-md-9 > div > ul")).select("a");
             String title,detail;
             for(int i=0;i<as.size();i++){
-                title=as.get(i).select("span.article-showTitle").text()+"——"+as.get(i).select("span.article-showTime").text();
-                detail="#https://it.swufe.edu.cn"+(as.get(i).attr("href")).replace("..","");
+                title=as.get(i).select("span.article-showTitle").text()+"——"+as.get(i).select("span.article-showTime").text()+"#";
+                detail="https://it.swufe.edu.cn"+(as.get(i).attr("href")).replace("..","");
                 Log.i(TAG,"getItNotices():"+title+detail);
                 dataList.add(new DataItem(title,detail));
             }
@@ -340,8 +372,8 @@ public class MainActivity extends AppCompatActivity implements Runnable{
             Elements lis=(doc.select("body > div > div.c_main > div > div > div.c_box_left > ul")).select("li");
             String title,detail;
             for(int i=0;i<lis.size();i++){
-                title=lis.get(i).select("a").attr("title")+"——"+lis.get(i).select("span").text();
-                detail="#http://www.swufe.edu.cn"+(lis.get(i).select("a").attr("href")).replace("..","");
+                title=lis.get(i).select("a").attr("title")+"——"+lis.get(i).select("span").text()+"#";
+                detail="http://www.swufe.edu.cn"+(lis.get(i).select("a").attr("href")).replace("..","");
                 Log.i(TAG,"getLectureInfo():"+title+detail);
                 dataList.add(new DataItem(title,detail));
             }
@@ -365,8 +397,8 @@ public class MainActivity extends AppCompatActivity implements Runnable{
             Elements as=(doc.select("body > div.main > div > div > div.col-xs-12.col-md-9 > div > ul")).select("a");
             String title,detail;
             for(int i=0;i<as.size();i++){
-                title=as.get(i).select("span.article-showTitle").text()+"——"+as.get(i).select("span.article-showTime").text();
-                detail="#https://it.swufe.edu.cn"+(as.get(i).attr("href")).replace("..","");
+                title=as.get(i).select("span.article-showTitle").text()+"——"+as.get(i).select("span.article-showTime").text()+"#";
+                detail="https://it.swufe.edu.cn"+(as.get(i).attr("href")).replace("..","");
                 Log.i(TAG,"getFrontInfo():"+title+detail);
                 dataList.add(new DataItem(title,detail));
             }

@@ -1,8 +1,12 @@
-package com.swufe.buffermergetool.ui.tools;
+package com.swufe.buffermergetool.ui.gallery;
+
 
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+
+import androidx.fragment.app.Fragment;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,13 +14,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
-import android.widget.TextView;
-
-import androidx.annotation.Nullable;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 
 import com.swufe.buffermergetool.DBHelper;
 import com.swufe.buffermergetool.DataItem;
@@ -27,28 +24,36 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class ToolsFragment extends Fragment {
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class NeedsFragment extends Fragment {
 
-    private ToolsViewModel toolsViewModel;
-    private static final String TAG="ToolsFragment";
+    private static final String TAG="NeedsFragment";
     private ListView out;
     private String data[];
     private SimpleAdapter listItemAdapter;//适配器
     private DataManager manager;
 
+    public NeedsFragment() {
+        // Required empty public constructor
+    }
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_tools, container, false);
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View root = inflater.inflate(R.layout.fragment_needs, container, false);
 
         manager=new DataManager(getActivity());
-        List<DataItem> data_list=(List<DataItem>)manager.listAll(DBHelper.TB_NAME7);
+        List<DataItem> data_list=(List<DataItem>)manager.listAll(DBHelper.TB_NAME2);
         data=new String[data_list.size()];
         for(int m=0;m<data_list.size();m++){
             data[m]=data_list.get(m).getCurName()+data_list.get(m).getCurData();
         }
 
-        out=root.findViewById(R.id.resultList_front);
+        out=root.findViewById(R.id.resultList_needs);
         List<HashMap<String,String>> dataList=new ArrayList<HashMap<String, String>>();
         for(int j=0;j<data.length;j++){
             HashMap<String,String> map=new HashMap<String,String>();
@@ -81,4 +86,5 @@ public class ToolsFragment extends Fragment {
 
         return root;
     }
+
 }
