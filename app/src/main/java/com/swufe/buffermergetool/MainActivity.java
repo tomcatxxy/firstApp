@@ -62,8 +62,9 @@ public class MainActivity extends AppCompatActivity implements Runnable{
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Thread thread=new Thread(MainActivity.this);
+                thread.start();
+                Toast.makeText(MainActivity.this,"Update data now, please wait a moment!",Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -78,11 +79,6 @@ public class MainActivity extends AppCompatActivity implements Runnable{
                 R.id.nav_tools, R.id.nav_share, R.id.nav_send)
                 .setDrawerLayout(drawer)
                 .build();
-       /* NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        mAppBarConfiguration = new AppBarConfiguration.Builder(
-                navController.getGraph())
-                .setDrawerLayout(drawer)
-                .build();*/
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
@@ -95,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements Runnable{
             updateTime=curDateStr;
             Thread thread=new Thread(this);
             thread.start();
+            Log.i(TAG,"run:日期不相等，更新数据");
         }
         handler=new Handler(){
             @Override
@@ -177,41 +174,72 @@ public class MainActivity extends AppCompatActivity implements Runnable{
 
     @Override
     public void run() {
-        Log.i(TAG,"run:run()....");
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
+        try{
+            getRecruitInfo();
+            getNeedsInfo();
+            getInternshipInfo();
+            getSwufeNotices();
+            getItNotices();
+            getLectureInfo();
+            getFrontInfo();
+        }catch (Exception e){
             e.printStackTrace();
+            Log.i(TAG,"run:请检查网络，如果网络没问题则说明网页已改变，那么请修改解析网页源代码");
         }
+        Message msg=handler.obtainMessage(7);
+        msg.what=5;
+        handler.sendMessage(msg);
+    }
 
-        Log.i(TAG,"run:日期不相等，更新数据");
-        //获取网络数据，放入List带回到主线程中
+    private void getRecruitInfo(){
+        Log.i(TAG,"getRecruitInfo():getRecruitInfo....");
+        //获取网络数据
         Document doc = null;
         List<DataItem> dataList=new ArrayList<DataItem>();
         try {
-            doc = Jsoup.connect("https://it.swufe.edu.cn/index/tzgg.htm").get();
-            Log.i(TAG,"run:"+doc.title());
-            //获取a中的数据
-            Elements as=(doc.select("body > div.main > div > div > div.col-xs-12.col-md-9 > div > ul")).select("a");
-            Elements td=(doc.select("body > div.main > div > div > div.col-xs-12.col-md-9 > div > div > table > tbody > tr > td > table > tbody > tr")).select("td");
-            int siteNum=Integer.parseInt((td.get(0).text()).substring(td.get(0).text().indexOf("/")+1));
+            doc = Jsoup.connect("https://jobzpgl.swufe.edu.cn/").get();
+            Log.i(TAG,"getInfo:"+doc.title());
+            //获取url
+            String url="https://jobzpgl.swufe.edu.cn"+(doc.select("body > div.wrap.mar0 > div:nth-child(2) > div.messList.fl > p > a.fr.zt14.cor8.hand.newsList_url.newsList_url1"))
+                    .select("a").attr("href");
+            Log.i(TAG,"getRecruitInfo():"+url);
+            doc = Jsoup.connect(url).get();
+            Elements lis=(doc.select("body > div.wrap.mar0 > ul.newListContent")).select("li");
             String title,detail;
-            Log.i(TAG,siteNum+"");
-            for(int i=0;i<as.size();i++){
-                title=as.get(i).attr("title")+"——"+as.get(i).select("span.article-showTime").text();
-                detail="#https://it.swufe.edu.cn"+(as.get(i).attr("href")).replace("..","");
+            for(int i=0;i<lis.size();i++){
+                title=lis.get(i).select("a").text()+"——"+lis.get(i).select("span").text();
+                detail="#https://jobzpgl.swufe.edu.cn"+(lis.get(i).attr("onclick")).replace("javascript:window.location.href='","");
+                Log.i(TAG,"getRecruitInfo():"+title+detail);
                 dataList.add(new DataItem(title,detail));
-                Log.i(TAG,"run():"+title+detail);
             }
-            for(int j=siteNum-1;j>0;j--){
-                doc = Jsoup.connect("https://it.swufe.edu.cn/index/tzgg/"+j+".htm").get();
-                Elements temp=(doc.select("body > div.main > div > div > div.col-xs-12.col-md-9 > div > ul")).select("a");
-                for(int k=0;k<temp.size();k++){
-                    title=temp.get(k).attr("title")+"——"+temp.get(k).select("span.article-showTime").text();
-                    detail="#https://it.swufe.edu.cn"+(temp.get(k).attr("href")).replace("..","");
-                    dataList.add(new DataItem(title,detail));
-                    Log.i(TAG,"run():"+title+detail);
-                }
+
+            //把数据写入数据库
+            manager.deleteAll(DBHelper.TB_NAME1);
+            manager.addAll(dataList,DBHelper.TB_NAME1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    private void getNeedsInfo(){
+        Log.i(TAG,"getNeedsInfo():getNeedsInfo....");
+        //获取网络数据
+        Document doc = null;
+        List<DataItem> dataList=new ArrayList<DataItem>();
+        try {
+            doc = Jsoup.connect("https://jobzpgl.swufe.edu.cn/").get();
+            Log.i(TAG,"getInfo:"+doc.title());
+            //获取url
+            String url="https://jobzpgl.swufe.edu.cn"+(doc.select("body > div.wrap.mar0 > div:nth-child(3) > div.messList.fl > p > a.fr.zt14.cor8.hand.employ_url.employ_url2"))
+                    .select("a").attr("href");
+            Log.i(TAG,"getNeedsInfo():"+url);
+            doc = Jsoup.connect(url).get();
+            Elements lis=(doc.select("body > div.wrap.mar0 > ul.newListContent")).select("li");
+            String title,detail;
+            for(int i=0;i<lis.size();i++){
+                title=lis.get(i).select("a").text()+"——"+lis.get(i).select("span").text();
+                detail="#https://jobzpgl.swufe.edu.cn"+(lis.get(i).attr("onclick")).replace("javascript:window.location.href='","");
+                Log.i(TAG,"getNeedsInfo():"+title+detail);
+                dataList.add(new DataItem(title,detail));
             }
 
             //把数据写入数据库
@@ -219,10 +247,135 @@ public class MainActivity extends AppCompatActivity implements Runnable{
             manager.addAll(dataList,DBHelper.TB_NAME2);
         } catch (IOException e) {
             e.printStackTrace();
-            Log.i(TAG,"run:请检查网络，如果网络没问题则说明网页已改变，那么请修改解析网页源代码");
         }
-        Message msg=handler.obtainMessage(7);
-        msg.what=5;
-        handler.sendMessage(msg);
+    }
+    private void getInternshipInfo(){
+        Log.i(TAG,"getInternshipInfo():getInternshipInfo....");
+        //获取网络数据
+        Document doc = null;
+        List<DataItem> dataList=new ArrayList<DataItem>();
+        try {
+            doc = Jsoup.connect("https://jobzpgl.swufe.edu.cn/").get();
+            Log.i(TAG,"getInfo:"+doc.title());
+            //获取url
+            String url="https://jobzpgl.swufe.edu.cn"+(doc.select("body > div.wrap.mar0 > div:nth-child(3) > div.messList.fl > p > a.fr.zt14.cor8.hand.employ_url.employ_url3"))
+                    .select("a").attr("href");
+            Log.i(TAG,"getInternshipInfo():"+url);
+            doc = Jsoup.connect(url).get();
+            Elements lis=(doc.select("body > div.wrap.mar0 > ul.newListContent")).select("li");
+            String title,detail;
+            for(int i=0;i<lis.size();i++){
+                title=lis.get(i).select("a").text()+"——"+lis.get(i).select("span").text();
+                detail="#https://jobzpgl.swufe.edu.cn"+(lis.get(i).attr("onclick")).replace("javascript:window.location.href='","");
+                Log.i(TAG,"getInternshipInfo():"+title+detail);
+                dataList.add(new DataItem(title,detail));
+            }
+
+            //把数据写入数据库
+            manager.deleteAll(DBHelper.TB_NAME3);
+            manager.addAll(dataList,DBHelper.TB_NAME3);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    private void getSwufeNotices() {
+        Log.i(TAG,"SwufeNotices():getSwufeNotices....");
+        //获取网络数据
+        Document doc = null;
+        List<DataItem> dataList=new ArrayList<DataItem>();
+        try {
+            doc = Jsoup.connect("https://www.swufe.edu.cn/index/tzgg.htm").get();
+            Log.i(TAG,"getSwufeNotices():"+doc.title());
+            //获取a中的数据
+            Elements lis=(doc.select("body > div > div.c_main > div > div > div.c_box_left > ul")).select("li");
+            String title,detail;
+            for(int i=0;i<lis.size();i++){
+                title=lis.get(i).select("a").attr("title")+"——"+lis.get(i).select("span").text();
+                detail="#http://www.swufe.edu.cn"+(lis.get(i).select("a").attr("href")).replace("..","");
+                Log.i(TAG,"getSwufeNotices():"+title+detail);
+                dataList.add(new DataItem(title,detail));
+            }
+
+            //把数据写入数据库
+            manager.deleteAll(DBHelper.TB_NAME4);
+            manager.addAll(dataList,DBHelper.TB_NAME4);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    private void getItNotices(){
+        Log.i(TAG,"getItNotices():getItNotices....");
+        //获取网络数据
+        Document doc = null;
+        List<DataItem> dataList=new ArrayList<DataItem>();
+        try {
+            doc = Jsoup.connect("https://it.swufe.edu.cn/index/tzgg.htm").get();
+            Log.i(TAG,"getItNotices():"+doc.title());
+            //获取a中的数据
+            Elements as=(doc.select("body > div.main > div > div > div.col-xs-12.col-md-9 > div > ul")).select("a");
+            String title,detail;
+            for(int i=0;i<as.size();i++){
+                title=as.get(i).select("span.article-showTitle").text()+"——"+as.get(i).select("span.article-showTime").text();
+                detail="#https://it.swufe.edu.cn"+(as.get(i).attr("href")).replace("..","");
+                Log.i(TAG,"getItNotices():"+title+detail);
+                dataList.add(new DataItem(title,detail));
+            }
+
+            //把数据写入数据库
+            manager.deleteAll(DBHelper.TB_NAME5);
+            manager.addAll(dataList,DBHelper.TB_NAME5);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    private void getLectureInfo(){
+        Log.i(TAG,"getLectureInfo():getLectureInfo....");
+        //获取网络数据
+        Document doc = null;
+        List<DataItem> dataList=new ArrayList<DataItem>();
+        try {
+            doc = Jsoup.connect("http://www.swufe.edu.cn/index/xsjz.htm").get();
+            Log.i(TAG,"getLectureInfo():"+doc.title());
+            //获取a中的数据
+            Elements lis=(doc.select("body > div > div.c_main > div > div > div.c_box_left > ul")).select("li");
+            String title,detail;
+            for(int i=0;i<lis.size();i++){
+                title=lis.get(i).select("a").attr("title")+"——"+lis.get(i).select("span").text();
+                detail="#http://www.swufe.edu.cn"+(lis.get(i).select("a").attr("href")).replace("..","");
+                Log.i(TAG,"getLectureInfo():"+title+detail);
+                dataList.add(new DataItem(title,detail));
+            }
+
+            //把数据写入数据库
+            manager.deleteAll(DBHelper.TB_NAME6);
+            manager.addAll(dataList,DBHelper.TB_NAME6);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    private void getFrontInfo(){
+        Log.i(TAG,"getFrontInfo():getFrontInfo....");
+        //获取网络数据
+        Document doc = null;
+        List<DataItem> dataList=new ArrayList<DataItem>();
+        try {
+            doc = Jsoup.connect("https://it.swufe.edu.cn/index/kydt.htm").get();
+            Log.i(TAG,"getFrontInfo():"+doc.title());
+            //获取a中的数据
+            Elements as=(doc.select("body > div.main > div > div > div.col-xs-12.col-md-9 > div > ul")).select("a");
+            String title,detail;
+            for(int i=0;i<as.size();i++){
+                title=as.get(i).select("span.article-showTitle").text()+"——"+as.get(i).select("span.article-showTime").text();
+                detail="#https://it.swufe.edu.cn"+(as.get(i).attr("href")).replace("..","");
+                Log.i(TAG,"getFrontInfo():"+title+detail);
+                dataList.add(new DataItem(title,detail));
+            }
+
+            //把数据写入数据库
+            manager.deleteAll(DBHelper.TB_NAME7);
+            manager.addAll(dataList,DBHelper.TB_NAME7);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
