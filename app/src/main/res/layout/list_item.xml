@@ -17,6 +17,7 @@
         android:layout_height="wrap_content"
         android:text="@string/app_name"
         android:textSize="20sp"
+        android:gravity="fill_horizontal"
         android:textColor="@color/colorPrimary"/>
 
     <TextView
@@ -25,7 +26,10 @@
         android:layout_height="wrap_content"
         android:gravity="right"
         android:text="@string/app_name"
-        android:textSize="15sp"/>
+        android:textSize="15sp"
+        android:maxLines="1"
+        android:maxEms="10"
+        android:ellipsize="end"/>
 
 
 </LinearLayout>

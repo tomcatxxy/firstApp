@@ -35,6 +35,7 @@ import android.widget.Toast;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
@@ -95,16 +96,20 @@ public class MainActivity extends AppCompatActivity implements Runnable{
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
+        //获取系统当前时间
         String curDateStr=(new SimpleDateFormat("yyyy-MM-dd")).format(new Date());
         SharedPreferences sp=getSharedPreferences("myUpdate", Activity.MODE_PRIVATE);
         updateTime=sp.getString("updateTime","0000-00-00");//获取上次更新的时间
 
+        //检查是否更新
         if(!curDateStr.equals(updateTime)){
             updateTime=curDateStr;
             Thread thread=new Thread(this);
             thread.start();
             Log.i(TAG,"run:日期不相等，更新数据");
         }
+
+        //处理子线程的返回
         handler=new Handler(){
             @Override
             public void handleMessage(@NonNull Message msg) {
@@ -130,7 +135,10 @@ public class MainActivity extends AppCompatActivity implements Runnable{
     }
 
     public boolean onOptionsItemSelected(@NonNull MenuItem item){
-        if(item.getItemId()==R.id.action_settings){}
+        if(item.getItemId()==R.id.action_settings){
+            Intent settings = new Intent(this, SettingsActivity.class);
+            startActivity(settings);
+        }
         else if(item.getItemId()==R.id.action_search){
             Intent query = new Intent(this, QueryActivity.class);
             startActivity(query);
@@ -207,6 +215,7 @@ public class MainActivity extends AppCompatActivity implements Runnable{
     @Override
     public void run() {
         try{
+            //Test();
             getRecruitInfo();
             getNeedsInfo();
             getInternshipInfo();
@@ -406,6 +415,24 @@ public class MainActivity extends AppCompatActivity implements Runnable{
             //把数据写入数据库
             manager.deleteAll(DBHelper.TB_NAME7);
             manager.addAll(dataList,DBHelper.TB_NAME7);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void Test(){
+        Document doc = null;
+        try {
+            doc = Jsoup.connect("https://www.chinabond.com.cn/cb/cn/xwgg/ggtz/zyjsgs/zytz/list.shtml").get();
+            Log.i(TAG,"run:"+doc.title());
+            //获取li中的数据
+            Elements tds=doc.getElementsByTag("li").select("a");
+            String title,detail;
+            for(int i=0;i<tds.size();i++){
+                title=tds.get(i).attr("title");//货币名称
+                detail=tds.get(i).attr("href");//td1对应的汇率
+                Log.i(TAG,"run:"+title+"==>"+detail);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
