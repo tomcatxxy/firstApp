@@ -10,13 +10,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
-import android.widget.TextView;
 
-import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 
 import com.swufe.buffermergetool.DBHelper;
 import com.swufe.buffermergetool.DataItem;
@@ -74,6 +70,24 @@ public class ToolsFragment extends Fragment {
                 intent.setData(Uri.parse(site));//Url 就是你要打开的网址
                 intent.setAction(Intent.ACTION_VIEW);
                 getActivity().startActivity(intent); //启动浏览器
+            }
+        });
+        out.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
+
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                HashMap<String,String> map=(HashMap<String, String>) out.getItemAtPosition(position);
+                String title=map.get("ItemTitle");
+                String site=map.get("ItemDetail");
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                String content="学校刚更新了公告，我看到下面这个消息，挺有意思，给你看看\n"+title+"\n"+site;
+                sendIntent.putExtra(Intent.EXTRA_TEXT, content);
+                sendIntent.setType("text/plain");
+
+                Intent shareIntent = Intent.createChooser(sendIntent, null);
+                startActivity(shareIntent);
+                return true;
             }
         });
 

@@ -7,13 +7,44 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:background="@drawable/line_linear">
 
         <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/suggestion_problem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/suggestion_hint" />
+            android:hint="@string/suggestion_hint"
+            android:minLines="9"
+            android:gravity="top" />
     </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
+        android:background="@drawable/line_linear">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/suggestion_contact"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:hint="@string/suggestion_hint2" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/suggestion_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:background="@color/colorPrimary"
+        android:text="@string/submit" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:text="@string/suggestion_text"/>
+
 </LinearLayout>

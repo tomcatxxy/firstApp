@@ -1,53 +1,27 @@
 package com.swufe.buffermergetool.ui.slideshow;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.ListFragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 
 import com.swufe.buffermergetool.DBHelper;
-import com.swufe.buffermergetool.Data;
 import com.swufe.buffermergetool.DataItem;
 import com.swufe.buffermergetool.DataManager;
-import com.swufe.buffermergetool.MainActivity;
 import com.swufe.buffermergetool.R;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
-
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Vector;
 
 public class SlideshowFragment extends Fragment{
 
@@ -96,6 +70,24 @@ public class SlideshowFragment extends Fragment{
                 intent.setData(Uri.parse(site));//Url 就是你要打开的网址
                 intent.setAction(Intent.ACTION_VIEW);
                 getActivity().startActivity(intent); //启动浏览器
+            }
+        });
+        out.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
+
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                HashMap<String,String> map=(HashMap<String, String>) out.getItemAtPosition(position);
+                String title=map.get("ItemTitle");
+                String site=map.get("ItemDetail");
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                String content="学校刚更新了公告，我看到下面这个消息，挺有意思，给你看看\n"+title+"\n"+site;
+                sendIntent.putExtra(Intent.EXTRA_TEXT, content);
+                sendIntent.setType("text/plain");
+
+                Intent shareIntent = Intent.createChooser(sendIntent, null);
+                startActivity(shareIntent);
+                return true;
             }
         });
 

@@ -36,5 +36,9 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
-    <string name="suggestion_hint">Please describe the problem in detail and fill in at least 15 words</string>
+    <string name="suggestion_hint">Please describe the problem in detail</string>
+    <string name="submit">Submit</string>
+    <string name="suggestion_hint2">Please input your contact information</string>
+    <string name="suggestion_text">Please do not submit bad information. Thank you very much for your cooperation</string>
+    <string name="Share_text">Thank you for sharing this app</string>
 </resources>
