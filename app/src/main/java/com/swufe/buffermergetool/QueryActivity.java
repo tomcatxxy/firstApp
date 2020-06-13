@@ -1,7 +1,5 @@
 package com.swufe.buffermergetool;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,6 +12,8 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -79,9 +79,27 @@ public class QueryActivity extends AppCompatActivity implements AdapterView.OnIt
                     );
                     out.setAdapter(listItemAdapter);
                     out.setOnItemClickListener(QueryActivity.this);
+                    out.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
+
+                        @Override
+                        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                            HashMap<String,String> map=(HashMap<String, String>) out.getItemAtPosition(position);
+                            String title=map.get("ItemTitle");
+                            String site=map.get("ItemDetail");
+                            Intent sendIntent = new Intent();
+                            sendIntent.setAction(Intent.ACTION_SEND);
+                            String content="学校刚更新了公告，我看到下面这个消息，挺有意思，给你看看\n"+title+"\n"+site;
+                            sendIntent.putExtra(Intent.EXTRA_TEXT, content);
+                            sendIntent.setType("text/plain");
+
+                            Intent shareIntent = Intent.createChooser(sendIntent, null);
+                            startActivity(shareIntent);
+                            return true;
+                        }
+                    });
                 }
                 else {
-                    Toast.makeText(QueryActivity.this,"Sorry!No information containing the keyword ",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(QueryActivity.this,R.string.query_fail,Toast.LENGTH_SHORT).show();
                 }
             }
         });

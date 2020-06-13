@@ -6,7 +6,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 
 public class GalleryPageAdapter extends FragmentPagerAdapter {
 
-    private final String[] titles=new String[]{"Recruit","Needs","Internship"};
+    private final String[] titles=new String[]{"招聘","需求","实习"};
 
     public GalleryPageAdapter(FragmentManager fm) {
         super(fm);

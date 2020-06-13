@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DBHelper extends SQLiteOpenHelper {
 
     private static final int VERSION=4;
-    private static final String DB_NAME="myta.db";
+    private static final String DB_NAME="myData.db";
     public static final String TB_NAME1="tb_recruit";
     public static final String TB_NAME2="tb_needs";
     public static final String TB_NAME3="tb_internship";

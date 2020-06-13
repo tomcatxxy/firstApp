@@ -1,10 +1,8 @@
 <resources>
     <string name="app_name">Swufer\'s Info</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Swufer\' Info</string>
+    <string name="nav_header_title" translatable="false">Swufer\'s Info</string>
     <string name="nav_header_subtitle">understand your information needs in SWUFE</string>
-    <string name="nav_header_desc">Navigation header</string>
+    <string name="nav_header_desc" translatable="false">Navigation header</string>
     <string name="action_settings">Settings</string>
 
     <string name="menu_home">Notices</string>
@@ -16,29 +14,37 @@
     <string name="hint_keyword">Please input your keyword</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="menu_search">Search</string>
     <string name="Helper">Help</string>
     <string name="query">Search</string>
     <string name="title_activity_settings">Settings</string>
 
     <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
+    <string name="messages_header">Set updating</string>
 
     <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
+    <string name="reply_title">Default update frequency</string>
 
     <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="suggestion_hint">Please describe the problem in detail</string>
     <string name="submit">Submit</string>
     <string name="suggestion_hint2">Please input your contact information</string>
     <string name="suggestion_text">Please do not submit bad information. Thank you very much for your cooperation</string>
-    <string name="Share_text">Thank you for sharing this app</string>
+    <string name="Share_text">Thank you for sharing this app！！！</string>
+    <string name="update_once_day">Once a day</string>
+    <string name="update_once_threeDay">Once every three days</string>
+    <string name="update_once_fiveDay">Once every five days</string>
+    <string name="update_once_week">once a week</string>
+    <string name="update">frequency</string>
+    <string name="communicate">Communicate</string>
+    <string name="update_success">Data has updated</string>
+    <string name="tips">Update data now, please wait a moment!</string>
+    <string name="floating_detail">Are you sure you want to update the data now?</string>
+    <string name="floating_yes">Yes</string>
+    <string name="floating_no">No</string>
+    <string name="floating_tips">Tips</string>
+    <string name="floating_understand">got it</string>
+    <string name="update_fail">Updating has failed</string>
+    <string name="query_fail">Sorry!No information containing the keyword</string>
+    <string name="feedback">Please input the problem you want to feedback</string>
 </resources>

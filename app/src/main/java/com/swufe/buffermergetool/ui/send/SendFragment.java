@@ -48,7 +48,7 @@ public class SendFragment extends Fragment implements View.OnClickListener{
             email.putExtra(Intent.EXTRA_TEXT, content);
             startActivity(email);
         }else {
-            Toast.makeText(getContext(),"Please input the problem you want to feedback",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(),R.string.feedback,Toast.LENGTH_SHORT).show();
         }
     }
 }

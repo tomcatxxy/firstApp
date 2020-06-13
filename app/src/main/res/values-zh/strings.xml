@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Swufer\'s Info</string>
+    <string name="Helper">使用帮助</string>
+    <string name="Share_text">非常感谢您分享此应用！！</string>
+    <string name="action_settings">设置</string>
+    <string name="hint_keyword">请输入要查询的关键字</string>
+    <string name="menu_gallery">校园招聘</string>
+    <string name="menu_home">公告信息</string>
+    <string name="menu_search">搜索</string>
+    <string name="menu_send">建议</string>
+    <string name="menu_share">分享</string>
+    <string name="menu_slideshow">学术讲座</string>
+    <string name="menu_tools">科技前沿</string>
+    <string name="messages_header">设置更新</string>
+    <string name="query">搜索</string>
+    <string name="reply_title">默认更新频率</string>
+    <string name="submit">提交</string>
+    <string name="suggestion_hint">请详细描述您要反馈的问题</string>
+    <string name="suggestion_hint2">请输入您的联系信息</string>
+    <string name="suggestion_text">请不要输入不良信息，谢谢您的合作！！</string>
+    <string name="title_activity_settings">设置</string>
+    <string name="nav_header_subtitle">理解您在SWUFE的信息需求</string>
+    <string name="update_once_day">一天一次</string>
+    <string name="update_once_fiveDay">五天一次</string>
+    <string name="update_once_threeDay">三天一次</string>
+    <string name="update_once_week">一周一次</string>
+    <string name="update">频率</string>
+    <string name="communicate">交流</string>
+    <string name="update_success">数据已更新</string>
+    <string name="tips">正在更新数据，请稍等一会儿</string>
+    <string name="floating_detail">请确认是否立即更新数据?</string>
+    <string name="floating_yes">是</string>
+    <string name="floating_no">否</string>
+    <string name="floating_tips">提示</string>
+    <string name="floating_understand">明白了</string>
+    <string name="update_fail">数据更新失败，请检查网络</string>
+    <string name="query_fail">抱歉！没有一则信息含有该关键字</string>
+    <string name="feedback">请输入您要反馈的问题！</string>
+</resources>

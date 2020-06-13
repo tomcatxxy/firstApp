@@ -1,12 +1,16 @@
 <resources>
     <!-- Reply Preference -->
     <string-array name="reply_entries">
-        <item>Reply</item>
-        <item>Reply to all</item>
+        <item>@string/update_once_day</item>
+        <item>@string/update_once_threeDay</item>
+        <item>@string/update_once_fiveDay</item>
+        <item>@string/update_once_week</item>
     </string-array>
 
     <string-array name="reply_values">
-        <item>reply</item>
-        <item>reply_all</item>
+        <item>1</item>
+        <item>3</item>
+        <item>5</item>
+        <item>7</item>
     </string-array>
 </resources>

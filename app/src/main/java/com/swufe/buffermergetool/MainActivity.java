@@ -23,6 +23,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.preference.PreferenceManager;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
@@ -32,8 +33,10 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -42,40 +45,46 @@ public class MainActivity extends AppCompatActivity implements Runnable{
     private AppBarConfiguration mAppBarConfiguration;
     private DrawerLayout drawer;
     private final String TAG="MainActivity";
-    DataManager manager= new DataManager(this);
+    DataManager manager= new DataManager(this);//获取数据库对象
     private Handler handler;
     private String updateTime;//构建汇率更新字符串，表示上次更新时间
+    private boolean flag=true;//需要更新则为true
+    private boolean error;//用于检查网络是否故障,没有故障为false
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //加载toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //设置FloatingActionButton
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder builder=new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle("提示").setMessage("请确认是否立即更新数据？").setPositiveButton("是", new DialogInterface.OnClickListener() {
+                builder.setTitle(R.string.floating_tips).setMessage(R.string.floating_detail).setPositiveButton(R.string.floating_yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Log.i(TAG,"FloatingActionButton：对话框事件处理");
                         Thread thread=new Thread(MainActivity.this);
                         thread.start();
-                        Toast.makeText(MainActivity.this,"Update data now, please wait a moment!",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this,R.string.tips,Toast.LENGTH_SHORT).show();
                     }
-                }).setNegativeButton("否",null);
+                }).setNegativeButton(R.string.floating_no,null);
                 builder.create().show();
 
             }
         });
 
+        //加载抽屉布局，并设置监听方便调试
         drawer = findViewById(R.id.drawer_layout);
         drawer.addDrawerListener(drawerListener);
 
+        //加载导航视图并且加载NavController
         NavigationView navigationView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
@@ -88,17 +97,40 @@ public class MainActivity extends AppCompatActivity implements Runnable{
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
-        //获取系统当前时间
-        String curDateStr=(new SimpleDateFormat("yyyy-MM-dd")).format(new Date());
+        //获取上次更新的时间
         SharedPreferences sp=getSharedPreferences("myUpdate", Activity.MODE_PRIVATE);
-        updateTime=sp.getString("updateTime","0000-00-00");//获取上次更新的时间
+        updateTime=sp.getString("updateTime","0000.00.00");
 
-        //检查是否更新
-        if(!curDateStr.equals(updateTime)){
-            updateTime=curDateStr;
+        //获取系统当前时间
+        SimpleDateFormat df = new SimpleDateFormat("yyyy.MM.dd");//设置日期格式
+        final String OSTime=df.format(new Date());//获取系统当前时间
+        Log.i(TAG,"onCreate:OSTime="+OSTime);
+
+        //获取设置的数据更新频率
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String frequency = sharedPrefs.getString(getString(R.string.update),"1");
+
+        //检查是否需要更新，若需要更新，则更新flag为true
+        try {
+            Date update=df.parse(updateTime);
+            Calendar rightNow =Calendar.getInstance();;
+            rightNow.setTime(update);
+            for(int n=0;n<Integer.valueOf(frequency);n++){
+                if(df.format(rightNow.getTime()).equals(OSTime)){
+                    flag=false;
+                }
+                rightNow.add(Calendar.DAY_OF_YEAR,1);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        //检查flag，若flag为true，则开启子线程完成更新，并将数据保存至数据库
+        if(flag){
+            updateTime=OSTime;
             Thread thread=new Thread(this);
             thread.start();
-            Log.i(TAG,"run:日期不相等，更新数据");
+            Log.i(TAG,"run:更新数据");
         }
 
         //处理子线程的返回
@@ -106,13 +138,17 @@ public class MainActivity extends AppCompatActivity implements Runnable{
             @Override
             public void handleMessage(@NonNull Message msg) {
                 if(msg.what==5){
-                    //记录更新日期
-                    SharedPreferences.Editor edit=getSharedPreferences("myUpdate", Activity.MODE_PRIVATE).edit();
-                    edit.putString("updateTime",updateTime);
-                    edit.commit();
-                    Log.i(TAG,"run:更新日期："+updateTime);
-                    Log.i(TAG,"onActivityResult:handlerMessage:committing of rate finished");
-                    Toast.makeText(MainActivity.this,"Data has updated",Toast.LENGTH_SHORT).show();
+                    if (!error) {
+                        //记录更新日期
+                        SharedPreferences.Editor edit=getSharedPreferences("myUpdate", Activity.MODE_PRIVATE).edit();
+                        edit.putString("updateTime",updateTime);
+                        edit.commit();
+                        Log.i(TAG,"run:更新日期："+updateTime);
+                        Log.i(TAG,"onActivityResult:handlerMessage:committing of rate finished");
+                        Toast.makeText(MainActivity.this,R.string.update_success,Toast.LENGTH_SHORT).show();
+                    }else {
+                        Toast.makeText(MainActivity.this,R.string.update_fail,Toast.LENGTH_SHORT).show();
+                    }
                 }
                 super.handleMessage(msg);
             }
@@ -128,22 +164,25 @@ public class MainActivity extends AppCompatActivity implements Runnable{
 
     public boolean onOptionsItemSelected(@NonNull MenuItem item){
         if(item.getItemId()==R.id.action_settings){
+            //转向设置页面
             Intent settings = new Intent(this, SettingsActivity.class);
             startActivity(settings);
         }
         else if(item.getItemId()==R.id.action_search){
+            //转向搜索页面
             Intent query = new Intent(this, QueryActivity.class);
             startActivity(query);
         }
         else if(item.getItemId()==R.id.action_helper){
+            //弹出帮助对话框
             AlertDialog.Builder builder=new AlertDialog.Builder(MainActivity.this);
-            builder.setTitle("使用帮助").setMessage("这是一款针对西南财经大学经济信息工程学院学生的APP，在这个APP中您能看到下面的信息：\n" +
+            builder.setTitle(R.string.Helper).setMessage("这是一款针对西南财经大学经济信息工程学院学生的APP，在这个APP中您能看到下面的信息：\n" +
                     "1、西南财经大学官网最近的通知公告；\n" +
                     "2、经济信息工程学院最近的通知公告;\n" +
                     "3、西南财经大学校园招聘信息；\n" +
                     "4、最近的学术讲座的举办情况；\n" +
                     "5、经济信息工程学院官网上发布的科技前沿信息。\n\n" +
-                    "APP每天都会更新一次信息，当然您也可以直接点击APP中的红色按钮来立刻更新信息，感谢您的使用！").setNegativeButton("明白了",null);
+                    "APP每天都会更新一次信息，当然您也可以直接点击APP中的红色按钮来立刻更新信息，感谢您的使用！").setNegativeButton(R.string.floating_understand,null);
             builder.create().show();
         }
         return super.onOptionsItemSelected(item);
@@ -186,7 +225,6 @@ public class MainActivity extends AppCompatActivity implements Runnable{
 
         @Override
         public void onDrawerStateChanged(int i) {
-            // 滑动状态
             switch (i){
                 case DrawerLayout.STATE_DRAGGING:
                     Log.i(TAG, "onDrawerStateChanged: 滑动状态");
@@ -195,7 +233,6 @@ public class MainActivity extends AppCompatActivity implements Runnable{
                     Log.i(TAG, "onDrawerStateChanged: 静止状态");
                     break;
                 case DrawerLayout.STATE_SETTLING:
-                    // 设置状态在静止状态之前调用, 表示正在调整到最终位置
                     Log.i(TAG, "onDrawerStateChanged: 设置状态");
                     break;
                 default:
@@ -207,14 +244,13 @@ public class MainActivity extends AppCompatActivity implements Runnable{
     @Override
     public void run() {
         try{
-            //Test();
-            getRecruitInfo();
-            getNeedsInfo();
-            getInternshipInfo();
-            getSwufeNotices();
-            getItNotices();
-            getLectureInfo();
-            getFrontInfo();
+            getRecruitInfo();//获取招聘信息
+            getNeedsInfo();//获取招聘需求信息
+            getInternshipInfo();//获取实习需求信息
+            getSwufeNotices();//获取学校公告
+            getItNotices();//获取学院公告
+            getLectureInfo();//获取讲座信息
+            getFrontInfo();//获取科技前沿信息
         }catch (Exception e){
             e.printStackTrace();
             Log.i(TAG,"run:请检查网络，如果网络没问题则说明网页已改变，那么请修改解析网页源代码");
@@ -251,6 +287,7 @@ public class MainActivity extends AppCompatActivity implements Runnable{
             manager.addAll(dataList,DBHelper.TB_NAME1);
         } catch (IOException e) {
             e.printStackTrace();
+            error=true;//网络出现问题，更新error
         }
     }
     private void getNeedsInfo(){
@@ -407,24 +444,7 @@ public class MainActivity extends AppCompatActivity implements Runnable{
             //把数据写入数据库
             manager.deleteAll(DBHelper.TB_NAME7);
             manager.addAll(dataList,DBHelper.TB_NAME7);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void Test(){
-        Document doc = null;
-        try {
-            doc = Jsoup.connect("https://www.chinabond.com.cn/cb/cn/xwgg/ggtz/zyjsgs/zytz/list.shtml").get();
-            Log.i(TAG,"run:"+doc.title());
-            //获取li中的数据
-            Elements tds=doc.getElementsByTag("li").select("a");
-            String title,detail;
-            for(int i=0;i<tds.size();i++){
-                title=tds.get(i).attr("title");//货币名称
-                detail=tds.get(i).attr("href");//td1对应的汇率
-                Log.i(TAG,"run:"+title+"==>"+detail);
-            }
+            error=false;//网络没问题，更新error
         } catch (IOException e) {
             e.printStackTrace();
         }

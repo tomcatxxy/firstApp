@@ -6,7 +6,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 
 public class HomePageAdapter extends FragmentPagerAdapter {
 
-    private final String[] titles=new String[]{"Swufe Notices","College Notice"};
+    private final String[] titles=new String[]{"学校公告","学院公告"};
 
     public HomePageAdapter(FragmentManager fm) {
         super(fm);
