@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements Runnable{
                     "3、西南财经大学校园招聘信息；\n" +
                     "4、最近的学术讲座的举办情况；\n" +
                     "5、经济信息工程学院官网上发布的科技前沿信息。\n\n" +
-                    "APP每天都会更新一次信息，当然您也可以直接点击APP中的红色按钮来立刻更新信息，感谢您的使用！").setNegativeButton(R.string.floating_understand,null);
+                    "APP每天都会更新一次信息，当然您也可以直接点击APP中的红色按钮来立刻更新信息，感谢您的使用！(长按消息还可分享哦)").setNegativeButton(R.string.floating_understand,null);
             builder.create().show();
         }
         return super.onOptionsItemSelected(item);
