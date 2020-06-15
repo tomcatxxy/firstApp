@@ -190,6 +190,7 @@ public class MainActivity extends AppCompatActivity implements Runnable{
 
     @Override
     public boolean onSupportNavigateUp() {
+        //快捷生成时自带
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
